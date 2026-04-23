@@ -1,19 +1,38 @@
-#!/bin/bash
-# OpenStack All-in-One: Node preparation (run on Dell R620 AFTER OS install)
-# Recommended: Ubuntu 22.04 LTS (24.04 + Kolla-Ansible can hit Galaxy cert_file / Python 3.12 errors)
-# Run: sudo ./01-prep-node.sh
+#!/usr/bin/env bash
+# OpenStack all-in-one (Ubuntu 24.04) — system preparation
+# Run as: sudo ./01-prep-ubuntu.sh
+# Creates stack user and installs base packages for DevStack
 
 set -e
-echo "=== OpenStack AIO – Node prep (Dell R620) ==="
 
-# Optional: set hostname (uncomment and set)
-# hostnamectl set-hostname openstack-aio
+echo "[*] Updating system..."
+export DEBIAN_FRONTEND=noninteractive
+apt-get -qq update
+apt-get -y upgrade
 
-apt-get update
-apt-get install -y git python3-dev libffi-dev gcc libssl-dev python3-venv
+echo "[*] Installing base packages..."
+apt-get -y install \
+  git \
+  sudo \
+  bridge-utils \
+  python3-pip \
+  python3-venv \
+  net-tools \
+  curl \
+  ca-certificates
 
-echo ""
-echo "Network interfaces (use these in globals.yml):"
-ip -br link show | grep -v '^lo'
-echo ""
-echo "Prepared. Next: run 02-deploy-kolla-aio.sh (or 02-deploy-devstack-aio.sh)"
+echo "[*] Creating stack user for DevStack..."
+if ! getent passwd stack >/dev/null; then
+  useradd -s /bin/bash -d /opt/stack -m stack
+  chmod 755 /opt/stack
+  echo "stack ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/stack
+  chmod 440 /etc/sudoers.d/stack
+  echo "[+] User stack created. Home: /opt/stack"
+else
+  echo "[.] User stack already exists."
+fi
+
+echo "[*] Done. Next steps:"
+echo "    1. Configure static IP: sudo ./02-configure-network.sh"
+echo "    2. Switch to stack user: sudo su - stack"
+echo "    3. Run DevStack install: ./03-devstack-install.sh  (from repo copy in /opt/stack)"
