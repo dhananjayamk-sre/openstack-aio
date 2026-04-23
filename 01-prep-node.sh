@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
-# OpenStack all-in-one (Ubuntu 24.04) — system preparation
-# Run as: sudo ./01-prep-ubuntu.sh
-# Creates stack user and installs base packages for DevStack
+# DevStack AIO (Ubuntu 24.04) — system preparation
+# Usage: sudo ./01-prep-ubuntu.sh
 
-set -e
+set -euo pipefail
 
 echo "[*] Updating system..."
 export DEBIAN_FRONTEND=noninteractive
@@ -21,18 +20,19 @@ apt-get -y install \
   curl \
   ca-certificates
 
-echo "[*] Creating stack user for DevStack..."
-if ! getent passwd stack >/dev/null; then
+echo "[*] Creating 'stack' user..."
+if ! id "stack" &>/dev/null; then
   useradd -s /bin/bash -d /opt/stack -m stack
   chmod 755 /opt/stack
   echo "stack ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/stack
   chmod 440 /etc/sudoers.d/stack
-  echo "[+] User stack created. Home: /opt/stack"
+  echo "[+] User 'stack' created"
 else
-  echo "[.] User stack already exists."
+  echo "[.] User 'stack' already exists"
 fi
 
-echo "[*] Done. Next steps:"
-echo "    1. Configure static IP: sudo ./02-configure-network.sh"
-echo "    2. Switch to stack user: sudo su - stack"
-echo "    3. Run DevStack install: ./03-devstack-install.sh  (from repo copy in /opt/stack)"
+echo "[*] Done."
+echo "Next:"
+echo "  - Configure network: ./02-configure-network.sh"
+echo "  - Switch user: sudo su - stack"
+echo "  - Install DevStack: ./03-devstack-install.sh"
