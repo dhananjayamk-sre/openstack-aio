@@ -25,3 +25,17 @@ Full OpenStack AIO (not DevStack) deployed on Dell R620 with automation scripts.
 - Running instances (K8s nodes)
 
 ## Repo structure
+
+## Pre-deployment validation
+
+Before deploying OpenStack, I built a validation script to check system readiness:
+
+- Memory, CPU virtualization (KVM)
+- Disk availability
+- Kernel modules
+- Networking (MTU, DNS, interfaces)
+- Docker and Python requirements
+- Security hardening (SSH, NTP, updates)
+
+Script:
+scripts/check-os-hardening.sh
