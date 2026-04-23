@@ -1,0 +1,5 @@
+- Dell R620 (AIO node)
+- OpenStack services: Nova, Neutron, Keystone, Glance
+- Internal network: 10.x
+- External: 192.168.x
+- Kubernetes cluster on top
